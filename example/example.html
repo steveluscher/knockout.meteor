@@ -1,0 +1,31 @@
+<head>
+  <title>Knockout Meteor &ndash; Todo List Example</title>
+</head>
+
+<body>
+  <h1>Todo List</h1>
+  
+  <!-- ko if: oldestUnfinishedTodo -->
+  <h2>Do this now!</h2>
+  <ul data-bind="template: {name: 'todo', data: oldestUnfinishedTodo}"></ul>
+  <!-- /ko -->
+  
+  <!-- ko if: unfinishedTodos().length -->
+  <h2>Unfinished Todos</h2>
+  <ul data-bind="template: {name: 'todo', foreach: unfinishedTodos}"></ul>
+  <!-- /ko -->
+  
+  <!-- ko if: finishedTodos().length -->
+  <h2>Finished Todos</h2>
+  <ul data-bind="template: {name: 'todo', foreach: finishedTodos}"></ul>
+  <!-- /ko -->
+  
+  <script type="text/html" id="todo">
+  <li>
+    <label>
+      <input type="checkbox" data-bind="checked: done">
+      <span data-bind="css: { done: done }, text: title"></span>
+    </label>
+  </li>
+  </script>
+</body>
