@@ -66,6 +66,16 @@ An optional Object. Recognizes the following keys:
 
 > See the "[Advanced Usage](http://knockoutjs.com/documentation/plugins-mapping.html#advanced_usage)" section of the Knockout Mapping documentation for more information.
 
+* `transform` – optional data transformation function to run on the data returned from Meteor before passing it into the Knockout Mapping plugin
+
+> For `find`, the function should expect and return a JavaScript array. For `findOne`, it should expect and return a single JavaScript object. One good use of `transform` is to convert a nested hash into an array so that it will be mapped into an `ObservableArray`. Example:
+
+    // person record stored in Mongo: { name: "Fred", phone_numbers: { home: "111-222-3344", work: "123-456-7890" } }
+    // desired format for Knockout Mapping: { name: "Fred", phone_numbers: [{ name: "home", value: "111-222-3344" }, { name: "work", value: "123-456-7890" }] }
+    var myTransform = function(person) { person.phone_numbers = _.map(person.phone_numbers, function(v, k) { return { name: k, value: v } }); return person; };
+    ko.meteor.findOne(People, {name: "Fred"}, { transform: myTransform })
+    ko.meteor.find(Cubes, {}, { transform: function(people) { return _.map(people, myTransform) } })()
+
 ## Requirements ##
 
 * Meteor *(>= 0.3.5)* – https://github.com/meteor/meteor

@@ -4,32 +4,35 @@ Knockout Meteor plugin v0.1
 License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
 Create Knockout Observables from queries against Meteor Collections.
-When the results of those queries change, knockout.meteor.js will 
+When the results of those queries change, knockout.meteor.js will
 ensure that the Observables are updated.
 
 http://github.com/steveluscher/knockout.meteor
 ###
 
-meteor = 
+meteor =
   find: (collection, selector, options = {}) ->
     apply_defaults(options)
-  
+
     # Set up the Meteor cursor for this selector
     meteor_cursor = collection.find(selector, options.meteor_options)
-  
+
     # This is the function we want rerun when the result of this query changes
     data_func = ->
       meteor_cursor.rewind()
-      meteor_cursor.fetch()
-  
+      data = meteor_cursor.fetch()
+      apply_transform(data, options)
+
     sync({}, data_func, options.mapping)
 
   findOne: (collection, selector, options = {}) ->
     apply_defaults(options)
-  
+
     # This is the function we want rerun when the result of this query changes
-    data_func = -> collection.findOne(selector, options.meteor_options)
-      
+    data_func = ->
+      data = collection.findOne(selector, options.meteor_options)
+      apply_transform(data, options)
+
     sync({}, data_func, options.mapping)
 
 apply_defaults = (options) ->
@@ -58,6 +61,12 @@ apply_defaults = (options) ->
       view_model = new options.view_model()
       ko.mapping.fromJS(opts.data, options.mapping, view_model)
 
+apply_transform = (data, options) ->
+  if options.transform
+    options.transform(data)
+  else
+    data
+
 sync = (target, data_func, mapping) ->
   # Make use of Meteor's invalidation contexts to trigger a re-mapping of the
   # view model's observableArray when the Meteor collection changes
@@ -66,7 +75,7 @@ sync = (target, data_func, mapping) ->
   ctx.run =>
     # Fetch fresh data
     data = data_func()
-    
+
     if target and target.__ko_mapping__
       # This target has already been mapped, so update it
       if _.isUndefined(ko.utils.unwrapObservable(target))
@@ -78,5 +87,5 @@ sync = (target, data_func, mapping) ->
     else
       # Map to this target for the first time
       target = ko.mapping.fromJS(data, mapping)
-    
+
 ko.exportSymbol('meteor', meteor)
