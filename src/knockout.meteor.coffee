@@ -4,32 +4,32 @@ Knockout Meteor plugin v0.1
 License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
 Create Knockout Observables from queries against Meteor Collections.
-When the results of those queries change, knockout.meteor.js will 
+When the results of those queries change, knockout.meteor.js will
 ensure that the Observables are updated.
 
 http://github.com/steveluscher/knockout.meteor
 ###
 
-meteor = 
+meteor =
   find: (collection, selector, options = {}) ->
     apply_defaults(options)
-  
+
     # Set up the Meteor cursor for this selector
     meteor_cursor = collection.find(selector, options.meteor_options)
-  
+
     # This is the function we want rerun when the result of this query changes
     data_func = ->
       meteor_cursor.rewind()
       meteor_cursor.fetch()
-  
+
     sync({}, data_func, options.mapping)
 
   findOne: (collection, selector, options = {}) ->
     apply_defaults(options)
-  
+
     # This is the function we want rerun when the result of this query changes
     data_func = -> collection.findOne(selector, options.meteor_options)
-      
+
     sync({}, data_func, options.mapping)
 
 apply_defaults = (options) ->
@@ -66,7 +66,7 @@ sync = (target, data_func, mapping) ->
   ctx.run =>
     # Fetch fresh data
     data = data_func()
-    
+
     if target and target.__ko_mapping__
       # This target has already been mapped, so update it
       if _.isUndefined(ko.utils.unwrapObservable(target))
@@ -77,6 +77,7 @@ sync = (target, data_func, mapping) ->
         ko.mapping.fromJS(data, target)
     else
       # Map to this target for the first time
-      target = ko.mapping.fromJS(data, mapping)
-    
+      result = ko.mapping.fromJS(data, mapping)
+      target = if ko.isObservable(result) then result else ko.observable(result)
+
 ko.exportSymbol('meteor', meteor)
