@@ -1,0 +1,48 @@
+<head>
+  <title>Knockout Meteor &ndash; Dynamic Finders Example</title>
+</head>
+
+<body>
+  <h1>Dynamic Finders</h1>
+
+  <h2>Search Options</h2>
+  <p>
+    <label for="collection">Collection:</label>
+    <select data-bind="options: collections, value: collection"></select>
+  </p>
+
+  <p>
+    <label for="minAge">Min age:</label>
+    <input id="minAge" type="text" data-bind="value: minAge" />
+  </p>
+
+  <p>
+    <label for="maxAge">Max age:</label>
+    <input id="maxAge" type="text" data-bind="value: maxAge" />
+  </p>
+
+  <p>
+    <label for="sortField">Sort by:</label>
+    <select data-bind="options: sortFields, value: sortField"></select>
+  </p>
+
+  <p>
+    <label for="sortAsc">Sort ascending:</label>
+    <input id="sortAsc" type="checkbox" data-bind="checked: sortAsc" />
+  </p>
+
+  <h2>findMany results</h2>
+  <div data-bind="template: { name: 'item', foreach: findMany }"></div>
+
+  <h2>findOne result</h2>
+  <!-- ko if: findOne -->
+  <div data-bind="template: { name: 'item', data: findOne }"></div>
+  <!-- /ko -->
+
+  <script type="text/html" id="item">
+  <p>
+    <span data-bind="text: name"></span>
+    (<span data-bind="text: age"></span>)
+  </p>
+  </script>
+</body>

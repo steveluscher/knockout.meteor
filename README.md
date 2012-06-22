@@ -44,15 +44,15 @@ Any update to the Meteor `Todos` collection will now trigger a UI refresh. This 
 
 ### The `collection` argument ###
 
-Must be an instance of a `Meteor.Collection`
+Must be an instance of a `Meteor.Collection`, or an `Observable` that wraps an instance of a `Meteor.Collection`.
 
 ### The `selector` argument ###
 
-A Mongo selector, or String. See the Meteor documentation on [`find()`](http://docs.meteor.com/#find) or [`findOne()`](http://docs.meteor.com/#findone) for more information.
+A Mongo selector, a String, or an `Observable` that wraps a Mongo selector or String. See the Meteor documentation on [`find()`](http://docs.meteor.com/#find) or [`findOne()`](http://docs.meteor.com/#findone) for more information.
 
 ### The `options` argument ###
 
-An optional Object. Recognizes the following keys:
+(Optional) An Object, or an `Observable` that wraps an Object. Recognizes the following keys:
 
 * `view_model` – an object constructor.
 
