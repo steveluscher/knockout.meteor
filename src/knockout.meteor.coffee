@@ -139,11 +139,11 @@ class MappedQuery
   execute: () =>
     # Fetch fresh data
     data = @data_func()
-
     if @finder.target and @finder.target.__ko_mapping__
       # This target has already been mapped, so update it
-      if _.isUndefined(ko.utils.unwrapObservable(@finder.target))
-        # There's nothing to map into, so replace the whole target
+      old = ko.utils.unwrapObservable(@finder.target)
+      if _.isUndefined(old) or (!_.isArray(data) and @mapping.key(old) isnt @mapping.key(data))
+        # There's either nothing to map into, or the key has changed, so replace the whole target
         @finder.target(ko.mapping.fromJS(data, @mapping))
       else
         # Remap to the existing target
