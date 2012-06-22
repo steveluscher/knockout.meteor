@@ -188,8 +188,8 @@ http://github.com/steveluscher/knockout.meteor
       data = this.data_func();
       if (this.finder.target && this.finder.target.__ko_mapping__) {
         old = ko.utils.unwrapObservable(this.finder.target);
-        if (_.isUndefined(old) || (!_.isArray(data) && this.mapping.key(old) !== this.mapping.key(data))) {
-          this.finder.target(ko.mapping.fromJS(data, this.mapping));
+        if (_.isUndefined(old) || (old && data && !_.isArray(old) && !_.isArray(data) && this.mapping.key(old) !== this.mapping.key(data))) {
+          this.finder.target(ko.utils.unwrapObservable(ko.mapping.fromJS(data, this.mapping)));
         } else {
           ko.mapping.fromJS(data, this.finder.target);
         }

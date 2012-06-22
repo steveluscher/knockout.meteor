@@ -142,9 +142,9 @@ class MappedQuery
     if @finder.target and @finder.target.__ko_mapping__
       # This target has already been mapped, so update it
       old = ko.utils.unwrapObservable(@finder.target)
-      if _.isUndefined(old) or (!_.isArray(data) and @mapping.key(old) isnt @mapping.key(data))
+      if _.isUndefined(old) or (old and data and not _.isArray(old) and not _.isArray(data) and @mapping.key(old) isnt @mapping.key(data))
         # There's either nothing to map into, or the key has changed, so replace the whole target
-        @finder.target(ko.mapping.fromJS(data, @mapping))
+        @finder.target(ko.utils.unwrapObservable(ko.mapping.fromJS(data, @mapping)))
       else
         # Remap to the existing target
         ko.mapping.fromJS(data, @finder.target)

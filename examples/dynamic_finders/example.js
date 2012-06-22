@@ -2,12 +2,14 @@ if (Meteor.is_client) {
   var People = new Meteor.Collection("people");
   var Cats = new Meteor.Collection("cats");
 
+  // basics
   var collection = ko.observable("People");
   var minAge = ko.observable(4);
   var maxAge = ko.observable(10);
   var sortField = ko.observable("Age");
   var sortAsc = ko.observable(true);
 
+  // computed observables to use as arguments for finders
   var meteorCollection = ko.computed(function() { return this[collection()]; }, this);
 
   var selector = ko.computed(function() {
@@ -20,20 +22,11 @@ if (Meteor.is_client) {
     return { meteor_options: meteor_options };
   });
 
-  var pp = function(obj) { return obj ? (_.isArray(obj) ? _.map(obj, pp) : obj.name() + ":" + obj.age()) : obj; };
-
+  // finders!
   var findMany = ko.meteor.find(meteorCollection, selector, options);
-  findMany.subscribe(function(val) { console.log("findMany changed", pp(val)); });
-
   var findOne = ko.meteor.findOne(meteorCollection, selector, options);
-  findOne.subscribe(function(val) {
-    console.log("findOne changed", pp(val));
-    if (val) {
-      val.name.subscribe(function(val) { console.log("findOne.name changed", val); });
-      val.age.subscribe(function(val) { console.log("findOne.age changed", val); });
-    }
-  });
 
+  // set up view model to bind to UI
   var viewModel = {
     collection: collection,
     collections: ["Cats", "People"],
@@ -47,6 +40,18 @@ if (Meteor.is_client) {
     findOne: findOne
   };
 
+  // for debugging
+  var pp = function(obj) { return obj ? (_.isArray(obj) ? _.map(obj, pp) : obj.name() + ":" + obj.age()) : obj; };
+  findMany.subscribe(function(val) { console.log("findMany changed", pp(val)); });
+  findOne.subscribe(function(val) {
+    console.log("findOne changed", pp(val));
+    if (val) {
+      val.name.subscribe(function(val) { console.log("findOne.name changed", val); });
+      val.age.subscribe(function(val) { console.log("findOne.age changed", val); });
+    }
+  });
+
+  // boot!
   Meteor.startup( function() { ko.applyBindings(viewModel); } );
 }
 
