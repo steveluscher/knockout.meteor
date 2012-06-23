@@ -1,11 +1,17 @@
 {
   "name": "knockout.meteor",
   "description": "A Meteor-to-Knockout bridge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/steveluscher/meteor.knockout.git"
   },
+  "contributors": [
+    {
+      "name": "Ken Pratt",
+      "email": "ken@kenpratt.net"
+    }
+  ],
   "dependencies": {
     "coffee-script": "~1.3.3"
   }
