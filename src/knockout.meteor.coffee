@@ -43,9 +43,13 @@ class AbstractFinder
 
     # If an argument to this finder happens to be a Knockout observable,
     # subscribe to it and recreate the query whenever it changes
-    @collection.subscribe(@run) if ko.isObservable(@collection)
-    @selector.subscribe(@run) if ko.isObservable(@selector)
-    @options.subscribe(@run) if ko.isObservable(@options)
+    ko.computed =>
+      ko.utils.unwrapObservable(@collection)
+      ko.utils.unwrapObservable(@selector)
+      ko.utils.unwrapObservable(@options)
+      return
+    .extend({throttle: 1}) # Defer, in case more than one argument changes at a time
+    .subscribe(@run)       # Run every time changes are detected
 
   run: () =>
     # Kill the existing query

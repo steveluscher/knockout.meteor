@@ -50,21 +50,20 @@ http://github.com/steveluscher/knockout.meteor
   AbstractFinder = (function() {
 
     function AbstractFinder(collection, selector, options) {
+      var _this = this;
       this.collection = collection;
       this.selector = selector;
       this.options = options != null ? options : {};
       this.run = __bind(this.run, this);
 
       this.target = null;
-      if (ko.isObservable(this.collection)) {
-        this.collection.subscribe(this.run);
-      }
-      if (ko.isObservable(this.selector)) {
-        this.selector.subscribe(this.run);
-      }
-      if (ko.isObservable(this.options)) {
-        this.options.subscribe(this.run);
-      }
+      ko.computed(function() {
+        ko.utils.unwrapObservable(_this.collection);
+        ko.utils.unwrapObservable(_this.selector);
+        ko.utils.unwrapObservable(_this.options);
+      }).extend({
+        throttle: 1
+      }).subscribe(this.run);
     }
 
     AbstractFinder.prototype.run = function() {
