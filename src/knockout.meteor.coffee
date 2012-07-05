@@ -86,6 +86,7 @@ class AbstractFinder
     # each Meteor record as an instance of that model
     if _.isFunction options.view_model
       options.mapping.create = (opts) ->
+        return ko.observable() unless opts.data
         view_model = new options.view_model()
         ko.mapping.fromJS(opts.data, options.mapping, view_model)
 
