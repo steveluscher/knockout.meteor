@@ -90,9 +90,6 @@ http://github.com/steveluscher/knockout.meteor
         },
         copy: []
       });
-      if (options.mapping.copy && _.isArray(options.mapping.copy)) {
-        options.mapping.copy = _.union(options.mapping.copy, ['_id']);
-      }
       if (_.isFunction(options.view_model)) {
         return options.mapping.create = function(opts) {
           var view_model;
