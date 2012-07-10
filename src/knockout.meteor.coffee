@@ -156,7 +156,11 @@ class MappedQuery
     else
       # Map to this target for the first time
       result = ko.mapping.fromJS(data, @mapping)
-      @finder.target = if ko.isObservable(result) then result else ko.observable(result)
+      if ko.isObservable(result)
+        @finder.target = result
+      else
+        @finder.target = ko.observable(result)
+        @finder.target.__ko_mapping__ = result.__ko_mapping__
 
     return @finder.target
 
