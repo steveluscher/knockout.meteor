@@ -28,7 +28,7 @@ if (Meteor.is_client) {
           // Let's update the Meteor model, hence persisting the
           // new value, and propagating it to all connected clients.
           var checked = ko.utils.unwrapObservable(this.target);
-          Todos.update(options.parent._id, { $set: { done: checked } });
+          Todos.update(ko.utils.unwrapObservable(options.parent._id), { $set: { done: checked } });
         });
         return observable;
       }

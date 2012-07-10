@@ -79,12 +79,6 @@ class AbstractFinder
       key: (item) -> ko.utils.unwrapObservable(item._id),
       copy: []
 
-    # The _id parameter is typically not something that we
-    # will change from the UI, so copy it straight into the
-    # view model without constructing it as an observable
-    if options.mapping.copy and _.isArray(options.mapping.copy)
-      options.mapping.copy = _.union(options.mapping.copy, ['_id'])
-
     # If we were passed a view_model in the options hash,
     # instruct the Knockout Mapping plugin to instantiate
     # each Meteor record as an instance of that model
