@@ -1,5 +1,5 @@
 ###
-Knockout Meteor plugin v0.2.2
+Knockout Meteor plugin v0.2.3
 (c) 2012 Steven Luscher, Ruboss - http://ruboss.com/
 License: MIT (http://www.opensource.org/licenses/mit-license.php)
 
