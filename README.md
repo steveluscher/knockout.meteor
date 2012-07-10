@@ -70,7 +70,7 @@ A Mongo selector, a String, or an `Observable` that wraps a Mongo selector or St
 
 * Meteor *(>= 0.3.5)* – https://github.com/meteor/meteor
 * knockout.js *(>= 2.1.0)* – https://github.com/SteveSanderson/knockout
-* knockout.mapping.js *(>= 2.1.2)* - https://github.com/SteveSanderson/knockout.mapping
+* knockout.mapping.js *(= 2.1.2)* - https://github.com/SteveSanderson/knockout.mapping
 
 ## Developing ##
 
