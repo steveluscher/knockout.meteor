@@ -197,7 +197,12 @@ http://github.com/steveluscher/knockout.meteor
         }
       } else {
         result = ko.mapping.fromJS(data, this.mapping);
-        this.finder.target = ko.isObservable(result) ? result : ko.observable(result);
+        if (ko.isObservable(result)) {
+          this.finder.target = result;
+        } else {
+          this.finder.target = ko.observable(result);
+          this.finder.target.__ko_mapping__ = result.__ko_mapping__;
+        }
       }
       return this.finder.target;
     };
