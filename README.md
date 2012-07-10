@@ -56,7 +56,7 @@ A Mongo selector, a String, or an `Observable` that wraps a Mongo selector or St
 
 * `view_model` – an object constructor.
 
-> The mapper will instantiate an object using this constructor, then map each record in the Meteor Collection to the resulting instance.
+> The mapper will instantiate an object using this constructor, then map each record in the Meteor Collection to the resulting instance. The constructor will receive, as its first parameter, an object representing the data returned from the query.
 
 * `meteor_options` – additional configuration for `Meteor.Collection.find()` or `Meteor.Collection.findOne()`.
 

@@ -91,7 +91,7 @@ class AbstractFinder
     if _.isFunction options.view_model
       options.mapping.create = (opts) ->
         return ko.observable() unless opts.data
-        view_model = new options.view_model()
+        view_model = new options.view_model(data)
         ko.mapping.fromJS(opts.data, options.mapping, view_model)
 
   createQuery: (collection, selector, options) ->
