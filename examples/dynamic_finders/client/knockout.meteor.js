@@ -87,8 +87,7 @@ http://github.com/steveluscher/knockout.meteor
       _.defaults(options.mapping, {
         key: function(item) {
           return ko.utils.unwrapObservable(item._id);
-        },
-        copy: []
+        }
       });
       if (_.isFunction(options.view_model)) {
         return options.mapping.create = function(opts) {

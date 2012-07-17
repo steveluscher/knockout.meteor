@@ -76,8 +76,7 @@ class AbstractFinder
     _.defaults options.mapping,
       # It's important to key collection members by their Mongo _id so that
       # the Knockout Mapping plugin can determine if an object is new or old
-      key: (item) -> ko.utils.unwrapObservable(item._id),
-      copy: []
+      key: (item) -> ko.utils.unwrapObservable(item._id)
 
     # If we were passed a view_model in the options hash,
     # instruct the Knockout Mapping plugin to instantiate
