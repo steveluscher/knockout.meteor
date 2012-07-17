@@ -1,7 +1,7 @@
 {
   "name": "knockout.meteor",
   "description": "A Meteor-to-Knockout bridge",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "repository": {
     "type": "git",
     "url": "git://github.com/steveluscher/meteor.knockout.git"
