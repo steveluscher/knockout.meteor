@@ -84,13 +84,16 @@ http://github.com/steveluscher/knockout.meteor
         mapping: {},
         view_model: null
       });
-      _.defaults(options.mapping, {
+      if (!_.isObject(options.mapping[""])) {
+        options.mapping[""] = {};
+      }
+      _.defaults(options.mapping[""], {
         key: function(item) {
           return ko.utils.unwrapObservable(item._id);
         }
       });
       if (_.isFunction(options.view_model)) {
-        return options.mapping.create = function(opts) {
+        return options.mapping[""].create = function(opts) {
           var view_model;
           if (!opts.data) {
             return ko.observable();
@@ -186,7 +189,7 @@ http://github.com/steveluscher/knockout.meteor
       data = this.data_func();
       if (this.finder.target && this.finder.target.__ko_mapping__) {
         old = ko.utils.unwrapObservable(this.finder.target);
-        if (_.isUndefined(old) || (old && data && !_.isArray(old) && !_.isArray(data) && this.mapping.key(old) !== this.mapping.key(data))) {
+        if (_.isUndefined(old) || (old && data && !_.isArray(old) && !_.isArray(data) && this.mapping[""].key(old) !== this.mapping[""].key(data))) {
           this.finder.target(ko.utils.unwrapObservable(ko.mapping.fromJS(data, this.mapping)));
         } else {
           ko.mapping.fromJS(data, this.finder.target);

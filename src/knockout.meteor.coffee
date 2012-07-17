@@ -71,9 +71,12 @@ class AbstractFinder
     _.defaults options,
       mapping: {}
       view_model: null
-
+    
+    # If a root level mapping doesn't exist, create it
+    options.mapping[""] = {} unless _.isObject(options.mapping[""])
+    
     # Merge in some mapping defaults
-    _.defaults options.mapping,
+    _.defaults options.mapping[""],
       # It's important to key collection members by their Mongo _id so that
       # the Knockout Mapping plugin can determine if an object is new or old
       key: (item) -> ko.utils.unwrapObservable(item._id)
@@ -82,7 +85,7 @@ class AbstractFinder
     # instruct the Knockout Mapping plugin to instantiate
     # each Meteor record as an instance of that model
     if _.isFunction options.view_model
-      options.mapping.create = (opts) ->
+      options.mapping[""].create = (opts) ->
         return ko.observable() unless opts.data
         view_model = new options.view_model(opts.data)
         ko.mapping.fromJS(opts.data, options.mapping, view_model)
@@ -140,7 +143,7 @@ class MappedQuery
     if @finder.target and @finder.target.__ko_mapping__
       # This target has already been mapped, so update it
       old = ko.utils.unwrapObservable(@finder.target)
-      if _.isUndefined(old) or (old and data and not _.isArray(old) and not _.isArray(data) and @mapping.key(old) isnt @mapping.key(data))
+      if _.isUndefined(old) or (old and data and not _.isArray(old) and not _.isArray(data) and @mapping[""].key(old) isnt @mapping[""].key(data))
         # There's either nothing to map into, or the key has changed, so replace the whole target
         @finder.target(ko.utils.unwrapObservable(ko.mapping.fromJS(data, @mapping)))
       else
