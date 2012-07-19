@@ -40,22 +40,22 @@ if (Meteor.is_client) {
     unfinishedTodos: ko.meteor.find(
       Todos,
       {done: false},
-      {mapping: todoMapping}
+      {},
+      todoMapping
     ),
     // Todos where 'done' == true
     finishedTodos: ko.meteor.find(
       Todos,
       {done: true},
-      {mapping: todoMapping}
+      {},
+      todoMapping
     ),
     // The todo with the oldest 'created_at' where 'done' == false
     oldestUnfinishedTodo: ko.meteor.findOne(
       Todos,
       {done: false},
-      {
-        meteor_options: {sort: {created_at: 1}},
-        mapping: todoMapping
-      }
+      {sort: {created_at: 1}},
+      todoMapping
     )
   };
   

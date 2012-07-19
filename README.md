@@ -21,7 +21,7 @@ Use `ko.meteor.find()` and `ko.meteor.findOne()` like you would normally use `ko
     var viewModel = {
       unfinishedTodos: ko.meteor.find(Todos, {done: false}),
       finishedTodos: ko.meteor.find(Todos, {done: true}),
-      oldestUnfinishedTodo: ko.meteor.findOne(Todos, {done: true}, {meteor_options: {sort: {created_at:1}}})
+      oldestUnfinishedTodo: ko.meteor.findOne(Todos, {done: true}, {sort: {created_at:1}})
     };
     Meteor.startup( function() { ko.applyBindings(viewModel); } );
 
@@ -39,8 +39,8 @@ Any update to the Meteor `Todos` collection will now trigger a UI refresh. This 
 
 `ko.meteor.find()` and `ko.meteor.findOne()` share the same method signature.
 
-    ko.meteor.find( collection, selector[, options] )
-    ko.meteor.findOne( collection, selector[, options] )
+    ko.meteor.find( collection, selector[, options, mapping] )
+    ko.meteor.findOne( collection, selector[, options, mapping] )
 
 ### The `collection` argument ###
 
@@ -52,19 +52,17 @@ A Mongo selector, a String, or an `Observable` that wraps a Mongo selector or St
 
 ### The `options` argument ###
 
-(Optional) An Object, or an `Observable` that wraps an Object. Recognizes the following keys:
+(Optional) An Object, or an `Observable` that wraps an Object. See the Meteor documentation on the `options` argument of [`find()`](http://docs.meteor.com/#find) and [`findOne()`](http://docs.meteor.com/#findone) for more information.
+
+### The `mapping` argument ###
+
+(Optional) An Object, or an `Observable` that wraps an Object. Recognizes the following special property:
 
 * `view_model` – an object constructor.
 
 > The mapper will instantiate an object using this constructor, then map each record in the Meteor Collection to the resulting instance. The constructor will receive, as its first parameter, an object representing the data returned from the query.
 
-* `meteor_options` – additional configuration for `Meteor.Collection.find()` or `Meteor.Collection.findOne()`.
-
-> See the Meteor documentation on the `options` argument of [`find()`](http://docs.meteor.com/#find) and [`findOne()`](http://docs.meteor.com/#findone) for more information.
- 
-* `mapping` – additional configuration for the Knockout Mapping plugin.
-
-> See the "[Advanced Usage](http://knockoutjs.com/documentation/plugins-mapping.html#advanced_usage)" section of the Knockout Mapping documentation for more information.
+The remaining `mapping` properties will be passed through to the Knockout Mapping plugin. See the "[Advanced Usage](http://knockoutjs.com/documentation/plugins-mapping.html#advanced_usage)" section of the Knockout Mapping documentation for more information.
 
 ## Requirements ##
 

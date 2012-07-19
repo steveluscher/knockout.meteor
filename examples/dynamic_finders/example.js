@@ -17,9 +17,9 @@ if (Meteor.is_client) {
   });
 
   var options = ko.computed(function() {
-    var meteor_options = { sort: {} };
-    meteor_options.sort[sortField().toLowerCase()] = sortAsc() ? 1 : -1;
-    return { meteor_options: meteor_options };
+    var options = { sort: {} };
+    options.sort[sortField().toLowerCase()] = sortAsc() ? 1 : -1;
+    return options;
   });
 
   // finders!

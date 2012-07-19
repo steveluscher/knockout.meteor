@@ -33,27 +33,34 @@ http://github.com/steveluscher/knockout.meteor
   })(Error);
 
   meteor = {
-    find: function(collection, selector, options) {
+    find: function(collection, selector, options, mapping) {
       if (options == null) {
         options = {};
       }
-      return (new FindMany(collection, selector, options)).run();
+      if (mapping == null) {
+        mapping = {};
+      }
+      return (new FindMany(collection, selector, options, mapping)).run();
     },
-    findOne: function(collection, selector, options) {
+    findOne: function(collection, selector, options, mapping) {
       if (options == null) {
         options = {};
       }
-      return (new FindOne(collection, selector, options)).run();
+      if (mapping == null) {
+        mapping = {};
+      }
+      return (new FindOne(collection, selector, options, mapping)).run();
     }
   };
 
   AbstractFinder = (function() {
 
-    function AbstractFinder(collection, selector, options) {
+    function AbstractFinder(collection, selector, options, mapping) {
       var _this = this;
       this.collection = collection;
       this.selector = selector;
       this.options = options != null ? options : {};
+      this.mapping = mapping != null ? mapping : {};
       this.run = __bind(this.run, this);
 
       this.target = null;
@@ -61,50 +68,50 @@ http://github.com/steveluscher/knockout.meteor
         ko.utils.unwrapObservable(_this.collection);
         ko.utils.unwrapObservable(_this.selector);
         ko.utils.unwrapObservable(_this.options);
+        ko.utils.unwrapObservable(_this.mapping);
       }).extend({
         throttle: 1
       }).subscribe(this.run);
     }
 
     AbstractFinder.prototype.run = function() {
-      var collection, options, selector;
+      var collection, mapping, options, selector;
       if (this.query) {
         this.query.destroy();
       }
       collection = ko.utils.unwrapObservable(this.collection);
       selector = ko.utils.unwrapObservable(this.selector);
       options = ko.utils.unwrapObservable(this.options);
-      this.applyDefaults(options);
-      this.query = this.createQuery(collection, selector, options);
+      mapping = this.processMapping(ko.utils.unwrapObservable(this.mapping));
+      this.query = this.createQuery(collection, selector, options, mapping);
       return this.query.run();
     };
 
-    AbstractFinder.prototype.applyDefaults = function(options) {
-      _.defaults(options, {
-        mapping: {},
-        view_model: null
-      });
-      if (!_.isObject(options.mapping[""])) {
-        options.mapping[""] = {};
+    AbstractFinder.prototype.processMapping = function(raw_mapping) {
+      var mapping, view_model;
+      mapping = _.clone(raw_mapping);
+      view_model = mapping.view_model;
+      delete mapping.view_model;
+      if (!_.isObject(mapping[""])) {
+        mapping[""] = {};
       }
-      _.defaults(options.mapping[""], {
+      _.defaults(mapping[""], {
         key: function(item) {
           return ko.utils.unwrapObservable(item._id);
         }
       });
-      if (_.isFunction(options.view_model)) {
-        return options.mapping[""].create = function(opts) {
-          var view_model;
+      if (_.isFunction(view_model)) {
+        mapping[""].create = function(opts) {
           if (!opts.data) {
             return ko.observable();
           }
-          view_model = new options.view_model(opts.data);
-          return ko.mapping.fromJS(opts.data, options.mapping, view_model);
+          return ko.mapping.fromJS(opts.data, mapping, new view_model(opts.data));
         };
       }
+      return mapping;
     };
 
-    AbstractFinder.prototype.createQuery = function(collection, selector, options) {
+    AbstractFinder.prototype.createQuery = function(collection, selector, options, mapping) {
       throw new NotImplementedError('createQuery');
     };
 
@@ -120,14 +127,14 @@ http://github.com/steveluscher/knockout.meteor
       return FindMany.__super__.constructor.apply(this, arguments);
     }
 
-    FindMany.prototype.createQuery = function(collection, selector, options) {
+    FindMany.prototype.createQuery = function(collection, selector, options, mapping) {
       var data_func, meteor_cursor;
-      meteor_cursor = collection.find(selector, options.meteor_options);
+      meteor_cursor = collection.find(selector, options);
       data_func = function() {
         meteor_cursor.rewind();
         return meteor_cursor.fetch();
       };
-      return new MappedQuery(this, data_func, options.mapping);
+      return new MappedQuery(this, data_func, mapping);
     };
 
     return FindMany;
@@ -142,12 +149,12 @@ http://github.com/steveluscher/knockout.meteor
       return FindOne.__super__.constructor.apply(this, arguments);
     }
 
-    FindOne.prototype.createQuery = function(collection, selector, options) {
+    FindOne.prototype.createQuery = function(collection, selector, options, mapping) {
       var data_func;
       data_func = function() {
-        return collection.findOne(selector, options.meteor_options);
+        return collection.findOne(selector, options);
       };
-      return new MappedQuery(this, data_func, options.mapping);
+      return new MappedQuery(this, data_func, mapping);
     };
 
     return FindOne;

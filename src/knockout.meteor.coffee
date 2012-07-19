@@ -19,11 +19,11 @@ class NotImplementedError extends Error
 # These functions are exported as ko.meteor.find and ko.meteor.findOne
 #
 meteor =
-  find: (collection, selector, options = {}) ->
-    (new FindMany(collection, selector, options)).run()
+  find: (collection, selector, options = {}, mapping = {}) ->
+    (new FindMany(collection, selector, options, mapping)).run()
 
-  findOne: (collection, selector, options = {}) ->
-    (new FindOne(collection, selector, options)).run()
+  findOne: (collection, selector, options = {}, mapping = {}) ->
+    (new FindOne(collection, selector, options, mapping)).run()
 
 #
 # A Finder accepts a collection, selector, and options hash as arguments,
@@ -38,7 +38,7 @@ meteor =
 # options - an Object, or a Knockout observable that returns an Object
 #
 class AbstractFinder
-  constructor: (@collection, @selector, @options = {}) ->
+  constructor: (@collection, @selector, @options = {}, @mapping = {}) ->
     @target = null
 
     # If an argument to this finder happens to be a Knockout observable,
@@ -47,6 +47,7 @@ class AbstractFinder
       ko.utils.unwrapObservable(@collection)
       ko.utils.unwrapObservable(@selector)
       ko.utils.unwrapObservable(@options)
+      ko.utils.unwrapObservable(@mapping)
       return
     .extend({throttle: 1}) # Defer, in case more than one argument changes at a time
     .subscribe(@run)       # Run every time changes are detected
@@ -59,24 +60,26 @@ class AbstractFinder
     collection = ko.utils.unwrapObservable(@collection)
     selector = ko.utils.unwrapObservable(@selector)
     options = ko.utils.unwrapObservable(@options)
-    @applyDefaults(options)
+    mapping = @processMapping(ko.utils.unwrapObservable(@mapping))
 
     # Create a MappedQuery (as defined in subclass)
-    @query = @createQuery(collection, selector, options)
+    @query = @createQuery(collection, selector, options, mapping)
 
     # Run the query
     @query.run()
 
-  applyDefaults: (options) ->
-    _.defaults options,
-      mapping: {}
-      view_model: null
+  processMapping: (raw_mapping) ->
+    mapping = _.clone(raw_mapping)
+    
+    # Extract the view_model property
+    view_model = mapping.view_model
+    delete mapping.view_model
     
     # If a root level mapping doesn't exist, create it
-    options.mapping[""] = {} unless _.isObject(options.mapping[""])
+    mapping[""] = {} unless _.isObject(mapping[""])
     
     # Merge in some mapping defaults
-    _.defaults options.mapping[""],
+    _.defaults mapping[""],
       # It's important to key collection members by their Mongo _id so that
       # the Knockout Mapping plugin can determine if an object is new or old
       key: (item) -> ko.utils.unwrapObservable(item._id)
@@ -84,34 +87,35 @@ class AbstractFinder
     # If we were passed a view_model in the options hash,
     # instruct the Knockout Mapping plugin to instantiate
     # each Meteor record as an instance of that model
-    if _.isFunction options.view_model
-      options.mapping[""].create = (opts) ->
+    if _.isFunction view_model
+      mapping[""].create = (opts) ->
         return ko.observable() unless opts.data
-        view_model = new options.view_model(opts.data)
-        ko.mapping.fromJS(opts.data, options.mapping, view_model)
-
-  createQuery: (collection, selector, options) ->
+        ko.mapping.fromJS(opts.data, mapping, new view_model(opts.data))
+    
+    mapping
+    
+  createQuery: (collection, selector, options, mapping) ->
     throw new NotImplementedError('createQuery')
 
 class FindMany extends AbstractFinder
-  createQuery: (collection, selector, options) ->
+  createQuery: (collection, selector, options, mapping) ->
     # Set up the Meteor cursor for this selector
-    meteor_cursor = collection.find(selector, options.meteor_options)
+    meteor_cursor = collection.find(selector, options)
 
     # This is the function we want rerun when the result of this query changes
     data_func = ->
       meteor_cursor.rewind()
       meteor_cursor.fetch()
 
-    new MappedQuery(@, data_func, options.mapping)
+    new MappedQuery(@, data_func, mapping)
 
 
 class FindOne extends AbstractFinder
-  createQuery: (collection, selector, options) ->
+  createQuery: (collection, selector, options, mapping) ->
     # This is the function we want rerun when the result of this query changes
-    data_func = -> collection.findOne(selector, options.meteor_options)
+    data_func = -> collection.findOne(selector, options)
 
-    new MappedQuery(@, data_func, options.mapping)
+    new MappedQuery(@, data_func, mapping)
 
 #
 # A MappedQuery monitors a finder for changes in its dataset. When it detects
