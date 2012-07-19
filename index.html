@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Knockout Meteor by steveluscher</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Knockout Meteor</h1>
+        <p>A Knockout-to-Meteor bridge</p>
+
+        <p class="view"><a href="https://github.com/steveluscher/knockout.meteor">View the Project on GitHub <small>steveluscher/knockout.meteor</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/steveluscher/knockout.meteor/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/steveluscher/knockout.meteor/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/steveluscher/knockout.meteor">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>Creates Knockout Observables based on queries against Meteor Collections. When the results of those queries change, Knockout Meteor will ensure that the associated Observables are updated.</p>
+
+<h2>Why?</h2>
+
+<p><a href="http://knockoutjs.com">Knockout</a> lets you create complex associations between Javascript model data and DOM elements using an expressive and declarative binding syntax. The Knockout Mapping plugin excels at atomically updating your Javascript models (and hence your UI) based on incoming data, updating only that which has changed. These are two strengths that Meteor does not currently possess.</p>
+
+<p><a href="http://meteor.com">Meteor</a>, however, makes it incredibly easy to ferry model data back and forth between a server and its connected clients. Knockout Meteor acts as a bridge between these two frameworks. It lets you construct queries against Meteor Collections that behave like Knockout Observables that update themselves atomically and automatically when the results of those queries change.</p>
+
+<h2>Usage</h2>
+
+<p>Let's assume there exists a <code>Meteor.Collection</code> called <code>Todos</code>, and that our view model wants to track unfinished todos, finished todos, and the oldest unfinished todo.</p>
+
+<pre><code>var Todos = new Meteor.Collection("todos");
+</code></pre>
+
+<h3>In the view model:</h3>
+
+<p>Use <code>ko.meteor.find()</code> and <code>ko.meteor.findOne()</code> like you would normally use <code>ko.observableArray()</code> and <code>ko.observable()</code>:</p>
+
+<pre><code>var viewModel = {
+  unfinishedTodos: ko.meteor.find(Todos, {done: false}),
+  finishedTodos: ko.meteor.find(Todos, {done: true}),
+  oldestUnfinishedTodo: ko.meteor.findOne(Todos, {done: true}, {sort: {created_at:1}})
+};
+Meteor.startup( function() { ko.applyBindings(viewModel); } );
+</code></pre>
+
+<h3>In the HTML:</h3>
+
+<p>Since <code>ko.meteor.find()</code> and <code>ko.meteor.findOne()</code> return instances of <code>ko.observableArray</code> and <code>ko.observable</code> respectively, you can bind to them in the way you're used to:</p>
+
+<pre><code>&lt;ul data-bind="foreach: unfinishedTodos"&gt;
+  &lt;li data-bind="text: title"&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+
+<p>Any update to the Meteor <code>Todos</code> collection will now trigger a UI refresh. This includes local updates, and updates pushed from the server.</p>
+
+<h2>Documentation</h2>
+
+<p><code>ko.meteor.find()</code> and <code>ko.meteor.findOne()</code> share the same method signature.</p>
+
+<pre><code>ko.meteor.find( collection, selector[, options, mapping] )
+ko.meteor.findOne( collection, selector[, options, mapping] )
+</code></pre>
+
+<h3>The <code>collection</code> argument</h3>
+
+<p>Must be an instance of a <code>Meteor.Collection</code>, or an <code>Observable</code> that wraps an instance of a <code>Meteor.Collection</code>.</p>
+
+<h3>The <code>selector</code> argument</h3>
+
+<p>A Mongo selector, a String, or an <code>Observable</code> that wraps a Mongo selector or String. See the Meteor documentation on <a href="http://docs.meteor.com/#find"><code>find()</code></a> or <a href="http://docs.meteor.com/#findone"><code>findOne()</code></a> for more information.</p>
+
+<h3>The <code>options</code> argument</h3>
+
+<p>(Optional) An Object, or an <code>Observable</code> that wraps an Object. See the Meteor documentation on the <code>options</code> argument of <a href="http://docs.meteor.com/#find"><code>find()</code></a> and <a href="http://docs.meteor.com/#findone"><code>findOne()</code></a> for more information.</p>
+
+<h3>The <code>mapping</code> argument</h3>
+
+<p>(Optional) An Object, or an <code>Observable</code> that wraps an Object. Recognizes the following special property:</p>
+
+<ul>
+<li>
+<code>view_model</code> – an object constructor.</li>
+</ul><blockquote>
+<p>The mapper will instantiate an object using this constructor, then map each record in the Meteor Collection to the resulting instance. The constructor will receive, as its first parameter, an object representing the data returned from the query.</p>
+</blockquote>
+
+<p>The remaining <code>mapping</code> properties will be passed through to the Knockout Mapping plugin. See the "<a href="http://knockoutjs.com/documentation/plugins-mapping.html#advanced_usage">Advanced Usage</a>" section of the Knockout Mapping documentation for more information.</p>
+
+<h2>Requirements</h2>
+
+<ul>
+<li>Meteor <em>(&gt;= 0.3.5)</em> – <a href="https://github.com/meteor/meteor">https://github.com/meteor/meteor</a>
+</li>
+<li>knockout.js <em>(&gt;= 2.1.0)</em> – <a href="https://github.com/SteveSanderson/knockout">https://github.com/SteveSanderson/knockout</a>
+</li>
+<li>knockout.mapping.js <em>(&gt;= 2.2.3)</em> - <a href="https://github.com/SteveSanderson/knockout.mapping">https://github.com/SteveSanderson/knockout.mapping</a>
+</li>
+</ul><h2>Developing</h2>
+
+<p>Want to contribute? Great! To hack away you'll want a clone of this repo, and the Coffeescript compiler.</p>
+
+<pre><code>&gt; git clone https://github.com/steveluscher/knockout.meteor.git
+&gt; cd knockout.meteor
+&gt; npm install
+</code></pre>
+
+<p><code>make compile</code> will compile the Coffeescript file in <code>./src</code> into Javascript files located in <code>./build</code> and <code>./example/client</code>. Use <code>make watch</code> if you would like the compiler to run every time you save.</p>
+
+<h2>Giving thanks</h2>
+
+<p>Web development pays bills, but my real passion is music. If you found this code useful, the best way to say thank you is to support my band <a href="http://lakefieldmusic.com">Lakefield</a> (<a href="http://twitter.com/lakefieldmusic">@lakefieldmusic</a>).</p>
+
+<h2>License</h2>
+
+<p>Copyright (C) 2012 Steven Luscher (<a href="http://twitter.com/steveluscher">@steveluscher</a>) and Ruboss Technology Coporation (<a href="http://twitter.com/rubosstech">@rubosstech</a>) – Released under the <a href="http://www.opensource.org/licenses/mit-license.php">MIT License</a></p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/steveluscher">steveluscher</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-5686019-5");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
