@@ -66,8 +66,8 @@ The remaining `mapping` properties will be passed through to the Knockout Mappin
 
 ## Requirements ##
 
-* Meteor *(>= 0.3.5)* – https://github.com/meteor/meteor
-* knockout.js *(>= 2.1.0)* – https://github.com/SteveSanderson/knockout
+* Meteor *(>= 0.5.9)* – https://github.com/meteor/meteor
+* knockout.js *(>= 2.2.1)* – https://github.com/SteveSanderson/knockout
 * knockout.mapping.js *(>= 2.2.3)* - https://github.com/SteveSanderson/knockout.mapping
 
 ## Developing ##
