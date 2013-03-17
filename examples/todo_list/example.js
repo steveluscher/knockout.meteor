@@ -66,6 +66,11 @@ if (Meteor.is_client) {
 if (Meteor.is_server) {
   var Todos = new Meteor.Collection("todos");
   
+  // Allow access to the Todos collection
+  Todos.allow({
+    update: function() { return true; }
+  });
+  
   Meteor.startup(function () {
     // Bootstrap the DB with some data
     if(Todos.find().count() == 0) {
