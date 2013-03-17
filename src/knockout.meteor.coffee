@@ -129,17 +129,17 @@ class MappedQuery
   destroy: () ->
     @active = false
 
-  # rerun on invalidation
-  onInvalidate: () =>
-    @run() if @active
-
   run: () ->
+    results = null
+
     # Make use of Meteor's invalidation contexts to trigger a
     # re-mapping of the view model when this finder's dataset changes.
-    ctx = new Meteor.deps.Context() # invalidation context
-    ctx.on_invalidate(@onInvalidate)
-    ctx.run(@execute)
-
+    Deps.autorun (computation) =>
+      results = @execute() if @active
+    
+    # Return the results
+    results
+    
   # Should only be called from Meteor.deps.Context#run
   execute: () =>
     # Fetch fresh data
