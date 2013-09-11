@@ -1,4 +1,4 @@
-if (Meteor.is_client) {
+if (Meteor.isClient) {
   // The server is publishing some Todos for us.
   // Let's subscribe to them.
   var Todos = new Meteor.Collection("todos");
@@ -63,7 +63,7 @@ if (Meteor.is_client) {
   Meteor.startup( function() { ko.applyBindings(viewModel); } );
 }
 
-if (Meteor.is_server) {
+if (Meteor.isServer) {
   var Todos = new Meteor.Collection("todos");
   
   // Allow access to the Todos collection
