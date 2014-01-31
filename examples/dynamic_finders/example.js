@@ -56,7 +56,7 @@ if (Meteor.isClient) {
   Meteor.startup( function() { ko.applyBindings(viewModel); } );
 }
 
-if (Meteor.is_server) {
+if (Meteor.isServer) {
 
   Meteor.startup(function () {
     // Bootstrap the DB with some data
