@@ -1,7 +1,7 @@
-if (Meteor.is_client) {
-  // The server is publishing some Todos for us.
-  // Let's subscribe to them.
-  var Todos = new Meteor.Collection("todos");
+// Our todos collection 
+Todos = new Meteor.Collection("todos");
+
+if (Meteor.isClient) {
   
   // This custom mapping adds a callback to a todo's "done" observable.
   // The callback watches for changes in the "done" property, and syncs
@@ -63,8 +63,7 @@ if (Meteor.is_client) {
   Meteor.startup( function() { ko.applyBindings(viewModel); } );
 }
 
-if (Meteor.is_server) {
-  var Todos = new Meteor.Collection("todos");
+if (Meteor.isServer) {
   
   // Allow access to the Todos collection
   Todos.allow({

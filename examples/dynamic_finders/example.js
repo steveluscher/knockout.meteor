@@ -1,6 +1,7 @@
-if (Meteor.is_client) {
-  var People = new Meteor.Collection("people");
-  var Cats = new Meteor.Collection("cats");
+People = new Meteor.Collection("people");
+Cats = new Meteor.Collection("cats");
+
+if (Meteor.isClient) {
 
   // basics
   var collection = ko.observable("People");
@@ -55,9 +56,7 @@ if (Meteor.is_client) {
   Meteor.startup( function() { ko.applyBindings(viewModel); } );
 }
 
-if (Meteor.is_server) {
-  var People = new Meteor.Collection("people");
-  var Cats = new Meteor.Collection("cats");
+if (Meteor.isServer) {
 
   Meteor.startup(function () {
     // Bootstrap the DB with some data
